@@ -41,6 +41,7 @@ targets:
       - path: DadStrong/Resources/Assets.xcassets
       - path: DadStrong/Resources/10sek.mp3
       - path: DadStrong/Resources/start.mp3
+      - path: DadStrong/Resources/PrivacyInfo.xcprivacy
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.christianbachmann.dadStrong

@@ -4,7 +4,7 @@
 Dad Strong ist ein Kraft- und Ausdauertrainingsprogramm für Väter.
 Fixer Trainingsplan (Training A + B), integrierte lineare Progression, Körper-Dokumentation mit Fotos.
 Kein Week-Tracker, kein Challenge-Druck — reine Konsistenz und Fortschrittsdokumentation.
-Ziel: im App Store veröffentlichen. Vermarktung über den fixen Plan und Community-Vergleich.
+Ziel: im App Store veröffentlichen.
 
 **Entwickler:** Christian Bachmann
 **Domain:** dadstrong.app
@@ -22,6 +22,8 @@ Wenn der User "Ende für heute", "Wir machen Schluss" oder ähnliches sagt →
 - Swift / SwiftUI (iOS 17+)
 - SwiftData — lokale Persistenz (WorkoutSession, BodyCheckIn, Zone2Session, SprintSession)
 - WidgetKit + App Group — Home Screen Widget (Small, Medium, Large)
+- ActivityKit — Live Activity / Dynamic Island (Herzfrequenz während Training)
+- CoreBluetooth — Herzfrequenz-Sensor via BLE (Heart Rate Service UUID 180D)
 - HealthKit — Körpergewicht lesen, Workouts schreiben
 - UserNotifications — wöchentliche Sonntagserinnerung 6:30 Uhr
 - xcodegen — Projektdatei aus `project.yml` generieren → nach neuen Dateien immer `xcodegen generate`
@@ -35,29 +37,35 @@ Wenn der User "Ende für heute", "Wir machen Schluss" oder ähnliches sagt →
 DadStrong/Sources/
 ├── DadStrongApp.swift          # Entry Point, ModelContainer, init-Calls
 ├── Models/                     # Exercise, WorkoutSession, BodyCheckIn, Zone2Session, SprintSession, ProgressionAdvice
-├── State/                      # WorkoutSessionState, WorkoutPhase, RestTimerState, AudioService, HealthKitManager, HeartRateManager
-├── Data/                       # ExercisesData, SharedWidgetData, StreakCalculator, PhotoStore
+├── State/                      # WorkoutSessionState, WorkoutPhase, RestTimerState, AudioService, HealthKitManager, HeartRateManager, LiveActivityManager
+├── Data/                       # ExercisesData, SharedWidgetData, StreakCalculator, PhotoStore, WidgetPhotoStore, Zone2Settings, ChallengeManager
 ├── Services/                   # NotificationService
 └── Views/
     ├── AppColors.swift         # Design Tokens (alle Farben hier)
-    ├── Components/             # PrimaryButton, RingTimerView, ScrollPicker, RingTimerState
-    ├── Home/                   # HomeView, WeekCalendarView, StreakBarView
+    ├── Components/             # PrimaryButton, RingTimerView, ScrollPicker, RingTimerState, ShareCardView, WorkoutStatusBar
+    ├── Home/                   # HomeView, WeekCalendarView, StreakBarView, TrainingCardsView, BottomPillBar, ChallengeCardView
     ├── Workout/                # WorkoutView, ActiveSetView, SetRestView, SpecificWarmupView,
     │                           # GeneralWarmupView, ExerciseTransitionView, BilateralRestEntryView,
-    │                           # TimedSetActiveView, SetView, RestView, SummaryView
+    │                           # TimedSetActiveView, SetView, SummaryView, DebugJumpSheet (#if DEBUG)
     ├── Journey/                # JourneyView, CheckInEntryView, ProgressionView, ProgressChartView
+    ├── Settings/               # SettingsView, WorkoutHistoryEditView, AddWorkoutSheet
     ├── Zone2/                  # Zone2SetupView, Zone2ActiveView
     └── Sprint/                 # SprintTrainingView
 
 DadStrongWidget/
-└── DadStrongWidget.swift       # Small, Medium, Large Widget — alles in einer Datei
+├── DadStrongWidget.swift            # Small, Medium, Large Widget
+├── DadStrongWidgetBundle.swift      # @main WidgetBundle Entry Point
+└── TrainingLiveActivityWidget.swift # Dynamic Island / Lock Screen Live Activity
+
+Shared/
+└── TrainingLiveActivityAttributes.swift  # ActivityKit Datenmodell (in beiden Targets)
 ```
 
 ---
 
 ## Trainingsplan (fest, nicht konfigurierbar — das ist das Produkt)
 
-**Training A:** Kniebeuge · Bankdrücken · Rudern · BSS (bilateral) · Farmer Walk (timed)
+**Training A:** Kniebeuge · Bankdrücken · Rudern · BSS (bilateral) · Farmer Walk (beidhändig, timed)
 **Training B:** Kreuzheben · OHP · Klimmzüge · Frontkniebeuge
 
 Progression: Linear. Nach jedem Trainingsblock wird das Gewicht erhöht wenn alle Sätze ≥ Threshold.
@@ -74,20 +82,20 @@ generalWarmup
   → activeSet(exerciseIndex, setIndex, isLeft?)
 
 activeSet → [FERTIG tap]
-  → bilateralResting   [bilateral, linke Seite fertig]
+  → bilateralResting   [bilateral, linke Seite fertig — 60s Pflichtpause, auto-advance bei Timer=0]
   → resting            [normaler Set, 180s zwischen Sets, 60s nach letztem Set]
 
 resting → [Timer 0, auto-advance]
-  → activeSet(setIndex+1)         [nächster Satz]
+  → activeSet(setIndex+1)
   → exerciseTransition(fromIndex) [letzter Satz → 2min Pause, AUTO-ADVANCE bei Timer=0]
 
 exerciseTransition → activeSet oder specificWarmup der nächsten Übung
   → complete → SummaryView
 
-preSet: nur noch für Timed-Übungen (Farmer Walk bilateral)
+preSet: nur noch für Timed-Übungen (Farmer Walk — beidhändig, nicht bilateral)
 ```
 
-**Wichtig:** Die Pause ist nicht verhandelbar. Kein Skip-Button in SetRestView.
+**Wichtig:** Die Pause ist nicht verhandelbar. Kein Skip-Button in SetRestView oder BilateralRestEntryView.
 
 ---
 
@@ -101,6 +109,7 @@ preSet: nur noch für Timed-Übungen (Farmer Walk bilateral)
 | `advanceAfterRest(exerciseIndex:setIndex:)` | Bewegt Phase weiter wenn Timer=0 |
 | `warmupStepDisplay(for:step:)` | Gibt (label, kg?) zurück für SpecificWarmupView |
 | `logBilateralLeft(...)` | Loggt linke Seite, wechselt zu rechter Seite |
+| `logTimedSet(...)` | Bilateral: loggt L/R. Nicht-bilateral: nur Phase-Wechsel (SetRestView loggt Gewicht) |
 | `finishExerciseTransition(fromIndex:)` | Startet nächste Übung |
 
 ---
@@ -139,7 +148,7 @@ sprint           = Color(red: 0.95, green: 0.15, blue: 0.15)  // #F22626 Rot
 | `WorkoutSet` | reps, weightKg, effort (EffortLevel), isLeft? |
 | `BodyCheckIn` | date, weightKg, waistCm, photoFront?, photoBack?, photoSide?, photoFilename? (legacy), isStart |
 | `Zone2Session` | date, durationSeconds, targetMinutes, avg/min/maxHeartRate |
-| `SprintSession` | date |
+| `SprintSession` | date, durationSeconds, sprintsCompleted, avg/min/maxHeartRate |
 
 ---
 
@@ -147,26 +156,42 @@ sprint           = Color(red: 0.95, green: 0.15, blue: 0.15)  // #F22626 Rot
 
 App Group ID: `group.com.christianbachmann.dadStrong`
 SharedWidgetData schreibt: Sessions (type: "A"/"B"/"zone2"/"sprint") + WidgetStreaks
-Widget-Bild: Asset `app-widget-bild` im Widget-Bundle → für public App ersetzen
+Widget-Bild: Asset `app-widget-bild` im Widget-Bundle (Fallback wenn User kein Foto gesetzt hat)
 
 ---
 
 ## Fotos
 
 `PhotoStore.swift` — speichert in `Documents/checkin-photos/`. Wird per iCloud gesichert.
-Dateinamen werden in BodyCheckIn als String gespeichert.
 
 ---
 
-## Für App Store (noch offen)
+## Live Activity
 
-- [ ] Privacy Manifest (`PrivacyInfo.xcprivacy`)
-- [ ] Privacy Policy URL (einfache Seite auf dadstrong.app)
-- [ ] Bundle ID für public Version ändern
-- [ ] Widget-Bild ersetzen (aktuell persönliches Foto von Christian)
-- [ ] Screenshots (6.5" + 5.5" iPhone)
-- [ ] Share-Karte (Progression teilbar machen)
-- [ ] Onboarding (2–3 Screens: was ist das Programm)
+`LiveActivityManager.shared` — `@MainActor` Singleton in `DadStrong/Sources/State/`.
+- `start(trainingName:accentColor:)` — beim `onAppear` der Training-Views
+- `update(heartRate:)` — bei jedem HR-Update
+- `end()` — in `finish()` / `onDisappear`
+
+Farb-Keys: `"accent"` (Kraft), `"zone2"` (Zone2), `"sprint"` (Sprint)
+Requires `@preconcurrency import ActivityKit` wegen Swift 6 Sendability.
+
+---
+
+## HeartRateManager
+
+`HeartRateManager` — `@MainActor @Observable`, als `.environment(hrManager)` in DadStrongApp injiziert.
+- Auto-Reconnect: `didDisconnectPeripheral` → startet automatisch neuen Scan
+- `startScanningIfNeeded()` — in `onAppear` aller Training-Views aufrufen
+- Background Modes: `bluetooth-central` + `audio` in Info.plist
+
+---
+
+## Hintergrund-Timer
+
+Zone2: `elapsed = Int(Date().timeIntervalSince(startTime))` — korrekt auch nach Background.
+Sprint: `phaseStartedAt: Date` pro Phase, `resyncAfterBackground()` bei `willEnterForegroundNotification`.
+WorkoutStatusBar: `TimelineView(.periodic)` — kein Drift, system-managed.
 
 ---
 
@@ -176,3 +201,5 @@ Dateinamen werden in BodyCheckIn als String gespeichert.
 - Nach neuen Dateien: `xcodegen generate`
 - Keine Skip-Buttons für Pausen — die Pause ist nicht verhandelbar
 - Kein Week-Tracker, kein Challenge-Druck — reine Dokumentation
+- **Kein Brainstorming/Planning bei kleinen Tasks** — direkt implementieren bei Bug fixes, UI-Änderungen, kleinen Features
+- **Keine langen Skill-Workflows** wenn die Aufgabe klar ist — Token sparen

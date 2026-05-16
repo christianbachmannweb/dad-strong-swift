@@ -98,6 +98,13 @@ struct LargeWidgetView: View {
     }
 
     private var photo: UIImage? {
+        // User-gewähltes Foto aus App Group hat Vorrang
+        if let url = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: groupID)?
+            .appendingPathComponent("widget-photo.jpg"),
+           let img = UIImage(contentsOfFile: url.path) {
+            return img
+        }
+        // Fallback: statisches Bundle-Asset
         if let url = Bundle.main.url(forResource: "app-widget-bild", withExtension: "png") {
             return UIImage(contentsOfFile: url.path)
         }
