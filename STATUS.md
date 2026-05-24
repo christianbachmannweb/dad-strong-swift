@@ -1,32 +1,48 @@
 # Dad Strong — Status
 
-**Letzte Session:** 2026-05-16
+**Letzte Session:** 2026-05-23
 
 ---
 
 ## Heute erledigt
 
-- **Trainings nachträglich hinzufügen** — `AddWorkoutSheet` + „+" Button in `WorkoutHistoryEditView`: Typ (A/B) + Datum wählen, Übungen durchgehen, Sätze eintragen, speichern
-- **Bug: BSS bilateral Pause** — 60s Pflichtpause zwischen Beinen erzwungen; `BilateralRestEntryView` mit `guard !submitted` gegen Doppel-Submit wenn `cancel()` `remaining=0` setzt
-- **Debug-Panel** `#if DEBUG` — `DebugJumpSheet` in `GeneralWarmupView`, springt direkt zu jeder Phase/Übung
-- **Bug: Keyboard blockiert Bestätigen** — `ToolbarItemGroup(placement: .keyboard)` in `SetRestView`; kein separater Button mehr
-- **Auto-Advance BilateralRestEntryView** — Timer=0 löst `submit()` aus (mit guard gegen Doppelfire)
-- **Timer-Zentrierung** — nach Bestätigung in `SetRestView` zentriert sich Timer vertikal
-- **Bug: Status-Bar-Timer springt** — `TimelineView(.periodic)` statt `Timer.publish` in `WorkoutStatusBar`
-- **Farmer Walk beidhändig** — `isBilateral: false`, Flow wie alle anderen Übungen (Pause + Gewicht eintragen)
-- **Share Card 9:16** — `ShareCardView` vollflächig 360×640pt, `ImageRenderer` mit `proposedSize` → 1080×1920px für Instagram Stories
+- **Bug: Körper-Check-In erscheint beim ersten App-Start** — `isCheckInDue` gibt `false` wenn kein Check-In vorhanden (statt `true`); Check-In nur über Einstellungen oder Sonntags-Trigger
+- **Körper-Check-In schließbar** — X-Button oben rechts (Orange-Rot), Bestätigungs-Dialog "Eintrag verwerfen?"
+- **Körper-Check-In UX** — Gewicht/Hüfte als Zahlenfeld (TextField, `.decimalPad`) statt Stepper; "SPEICHERN" Button zentriert und vollflächig tappbar
+- **Challenge: A+B Bedingung** — Challenge startet erst wenn beide Trainingstypen je einmal absolviert; Hinweis-Text wenn Bedingung nicht erfüllt
+- **Hint "Krank eintragen"** — Text unter Challenge-Legende: "Leere Tage antippen → als Krank markieren"
+- **Trainings bearbeiten: Swipe to Delete** — `List` mit `.swipeActions` statt `ScrollView`; `modelContext.delete(session)` per Wisch
+- **AddWorkoutSheet UX** — Gewicht als TextField (`.decimalPad`), korrektes Padding, vollflächige Buttons mit `.contentShape(Rectangle())`
+- **PrimaryButton vollflächig** — `.contentShape(Rectangle())` im Button-Label
+- **Farmer's Walk: Zeit-Übergabe** — `pendingTimedSeconds` auf `WorkoutSessionState`; -1 Sek. Kompensation (`max(elapsed - 1, 1)`); letzter Satz geht nicht direkt zu `complete`, immer über `resting` → `SetRestView`
+- **Effort-Symbole konsistent** — überall `level.rawValue` statt Custom-Funktion (`-` / `*` / `**`)
+- **OK-Button in Pausen-Screens** — `ToolbarItem` rechts oben in `SetRestView` und `BilateralRestEntryView`
+- **Instagram Stories Teilen** — "STORY TEILEN" Button in `SummaryView`; `UIPasteboard` + `instagram-stories://` URL-Scheme; `LSApplicationQueriesSchemes` in Info.plist
+- **TestFlight-Link in Einstellungen** — `https://testflight.apple.com/join/7MQz3GNG`
+- **Pre-Workout Prep-Screen** — `TrainingPrepView` zeigt Übungsübersicht + Warm-Up-Info; öffnet sich als `.sheet(item:)` bei Tap auf Training A/B; `TrainingType: Identifiable`
+- **Onboarding** — 3 Screens (Willkommen / Training A&B / Fortschritt), `TabView(.page)`, animierte Punkte, einmalig beim ersten Start; `RootView` in `DadStrongApp.swift`
 
 ---
 
 ## Nächste Schritte
 
-1. **Onboarding (2–3 Screens)** — beim ersten App-Start, nie wieder danach
-   - Screen 1: Was ist Dad Strong (Headline + kurzer Text)
-   - Screen 2: Wie funktioniert A/B + lineare Progression
-   - Screen 3: Widget einrichten + Einstellungen-Hinweis
-   - Flag: `UserDefaults.standard.bool(forKey: "hasSeenOnboarding")`
-2. **App Store App-ID** — Platzhalter `id0000000000` in `SettingsView` ersetzen
-3. **Screenshots** — 6.5" (iPhone 14/15 Pro Max) + 5.5" (iPhone 8 Plus)
+1. **Englische Lokalisierung** ← höchste Priorität vor Launch (US-Tester kämpft sich durch deutsche App)
+   - `Text("...")` → `String(localized:)`
+   - `Localizable.strings` für "de" und "en"
+   - Info.plist Privacy-Texte übersetzen
+   - iOS wählt Sprache automatisch, kein In-App-Picker nötig
+2. **Dynamic Island & Lock Screen** — kompakte DI-Ansicht prominenter (wie Ladder App); Lock Screen zeigt Puls groß bei Zone 2 / Sprint (LiveActivityManager bereits vorhanden, UI-Verbesserung nötig)
+3. **Progress Bar im Training** — Balken zeigt wieviel % des Trainings abgeschlossen (wie Ladder App)
+3. **App Store App-ID** — Platzhalter in `SettingsView` ersetzen wenn live
+4. **Screenshots** — 6.5" (iPhone 14/15 Pro Max) + 5.5" (iPhone 8 Plus)
+
+---
+
+## Geplant (nach Launch / v1.1)
+
+- **Audio-Coaching** — Christians Stimme in Pausen, exercise-spezifisch, via PocketBase (`weekly_audio` Collection); Konzept noch in Planung
+- **Looping-Video Hintergrund** — Christian nimmt selbst auf
+- **Geführtes Warm-Up mit Video** + Toggle im Prep-Screen
 
 ---
 
@@ -43,8 +59,10 @@
 - [x] 12-Wochen-Challenge Card
 - [x] BottomPillBar Navigation
 - [x] Sprint-Training (Ring-Timer, Auto-Flow, HR-Anzeige)
-- [x] Trainings nachträglich hinzufügen/editieren
-- [ ] Onboarding ← nächster Schritt
+- [x] Trainings nachträglich hinzufügen/editieren/löschen
+- [x] Onboarding
+- [x] TestFlight-Link in Einstellungen
+- [ ] Englische Lokalisierung ← nächster Schritt
 - [ ] App Store App-ID eintragen
 - [ ] Screenshots
 
@@ -54,4 +72,4 @@
 
 - SourceKit zeigt false-positive Fehler nach Datei-Änderungen — verschwindet nach Build
 - `app-widget-bild.png` im Widget-Bundle ist Fallback solange User kein Foto gesetzt hat
-- Steps-Feature: UX-Platzierung noch offen
+- xcodegen nach neuen Dateien immer ausführen: `xcodegen generate`

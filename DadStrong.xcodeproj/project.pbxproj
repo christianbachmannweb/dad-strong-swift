@@ -80,8 +80,10 @@
 		D215895CAD292BD44CAC80EA /* GeneralWarmupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 349D6C209B953D3255040803 /* GeneralWarmupView.swift */; };
 		D743D68DAE1606BA375DE7EA /* PrimaryButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95B86A6FF5437659D844DF9 /* PrimaryButton.swift */; };
 		EC964BBD8BCD4DA59CB4FF1F /* CompactStreakBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B274334C9BB609887A680DD /* CompactStreakBadge.swift */; };
+		EE73FE369C282A8F715A35BC /* TrainingPrepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42800A7BCE4D17366EF0AE07 /* TrainingPrepView.swift */; };
 		F1123F8AE89205E71ACB8A20 /* TrainingCardsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9F09BB269E2217D7A94FBDF /* TrainingCardsView.swift */; };
 		F13A55610F30AEE6203D7D5D /* DebugJumpSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECA31ED9EBC26E2DA3486D95 /* DebugJumpSheet.swift */; };
+		F219EBADBD0D68ECBE28216F /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDCB67B7197F81B7B08B883B /* OnboardingView.swift */; };
 		F2AAE924D02C684EB620A68A /* HeartRateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05EF4F7BF53DE68A37C3AAC0 /* HeartRateManager.swift */; };
 		F502B6BBBC955C940F113AC1 /* WorkoutSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04EC0F9697ECDD0F235799EC /* WorkoutSet.swift */; };
 		F8838D31D7A8333A9954498B /* ProgressionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BD7A757304E3A9ED8E99D9F /* ProgressionView.swift */; };
@@ -137,6 +139,7 @@
 		3A7EEEBA845770FDC4542BED /* WorkoutPhase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutPhase.swift; sourceTree = "<group>"; };
 		3D0400A953D65AD557A3F8C2 /* ShareCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareCardView.swift; sourceTree = "<group>"; };
 		3D2109FE8A5110C06306A056 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		42800A7BCE4D17366EF0AE07 /* TrainingPrepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingPrepView.swift; sourceTree = "<group>"; };
 		43FA93C2CF73CD73EBE901D2 /* HealthKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitManager.swift; sourceTree = "<group>"; };
 		475CF8CB36BD8C2E755BDAA1 /* TimedSetActiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimedSetActiveView.swift; sourceTree = "<group>"; };
 		4C878E9291D55AFB3126C885 /* AddWorkoutSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddWorkoutSheet.swift; sourceTree = "<group>"; };
@@ -178,6 +181,7 @@
 		D366A22E26F64207A14246AF /* ChallengeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChallengeManager.swift; sourceTree = "<group>"; };
 		D7862F508C0141E7DAC43702 /* LiveActivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityManager.swift; sourceTree = "<group>"; };
 		D8DEDBC110DA0761E7BC662C /* DadStrongWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = DadStrongWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		DDCB67B7197F81B7B08B883B /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		DE002423CC75FB26FB6AA058 /* start.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = start.mp3; sourceTree = "<group>"; };
 		DEAFED6F6D6EF6F3448FD249 /* SharedWidgetData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedWidgetData.swift; sourceTree = "<group>"; };
 		E95B86A6FF5437659D844DF9 /* PrimaryButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryButton.swift; sourceTree = "<group>"; };
@@ -242,6 +246,14 @@
 			);
 			name = Sources;
 			path = DadStrong/Sources;
+			sourceTree = "<group>";
+		};
+		342EB34F9CB64394F9B2E863 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				DDCB67B7197F81B7B08B883B /* OnboardingView.swift */,
+			);
+			path = Onboarding;
 			sourceTree = "<group>";
 		};
 		36B7CF8585A8B2AB78231508 /* Journey */ = {
@@ -309,6 +321,7 @@
 				035212943BB8943912970649 /* Components */,
 				DF9678D452F37FEB4E3046CB /* Home */,
 				36B7CF8585A8B2AB78231508 /* Journey */,
+				342EB34F9CB64394F9B2E863 /* Onboarding */,
 				3AA1922364C365D690082C71 /* Settings */,
 				91A1ECC1313B4347317420CF /* Sprint */,
 				7CDE8170FA706427846C64E2 /* Summary */,
@@ -446,6 +459,7 @@
 				A11F7EFCD4D79C7BFC8F8AC4 /* StreakView.swift */,
 				99F53EB3D5E2F3DEE7BA1C46 /* TrainingButton.swift */,
 				E9F09BB269E2217D7A94FBDF /* TrainingCardsView.swift */,
+				42800A7BCE4D17366EF0AE07 /* TrainingPrepView.swift */,
 				F9BBC9FDD33E51F1281C76A9 /* WeekCalendarView.swift */,
 			);
 			path = Home;
@@ -592,6 +606,7 @@
 				24B70299AB3F8B35155FD6BE /* JourneyView.swift in Sources */,
 				524B48DBBABF185662170938 /* LiveActivityManager.swift in Sources */,
 				AF93D1609CA0A2218E8E9DE7 /* NotificationService.swift in Sources */,
+				F219EBADBD0D68ECBE28216F /* OnboardingView.swift in Sources */,
 				FF72F4A7613F5339D486B448 /* PhotoStore.swift in Sources */,
 				D743D68DAE1606BA375DE7EA /* PrimaryButton.swift in Sources */,
 				6F82A4EA25F73371D7BAD65B /* ProgressChartView.swift in Sources */,
@@ -617,6 +632,7 @@
 				843747C2865710D0BDA57FC6 /* TrainingButton.swift in Sources */,
 				F1123F8AE89205E71ACB8A20 /* TrainingCardsView.swift in Sources */,
 				4CEDB159B9C70A0B0F814AC7 /* TrainingLiveActivityAttributes.swift in Sources */,
+				EE73FE369C282A8F715A35BC /* TrainingPrepView.swift in Sources */,
 				5B6629832D852CCE05A95367 /* TrainingType.swift in Sources */,
 				8490CC55C89630CE15F985A3 /* WeekCalendarView.swift in Sources */,
 				4EC9BAB2DCE7AECE0D74B26B /* WidgetPhotoStore.swift in Sources */,
